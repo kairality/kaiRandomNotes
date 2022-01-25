@@ -22,6 +22,8 @@ function turnRight(direction) {
         case "U": // up
             return "R";
     }
+    // could throw an error instead, but not today
+    // (nothing will ever pass an invalid input here anyway right???)
     return going;
 }
 
@@ -37,13 +39,12 @@ function wasVisited(visitationRecord, i, j) {
 // column in our row is already marked as visited in the visitation record.
 // the other directions work similarly.
 function shouldTurn(visitationRecord, currI, currJ, direction) {
-    let isEnd = false;
     let jCols = visitationRecord[0].length;
     let iRows = visitationRecord.length;
     switch (direction) {
         case "R":
             if (currJ === (jCols - 1)) return true;
-            if (wasVisited(visitationRecord, currI, currJ + 1)) isEnd = true;
+            if (wasVisited(visitationRecord, currI, currJ + 1)) return true;
             break;
         case "D":
             if (currI === iRows - 1) return true;
@@ -51,14 +52,15 @@ function shouldTurn(visitationRecord, currI, currJ, direction) {
             break;
         case "L":
             if (currJ === 0) return true;
-            if (wasVisited(visitationRecord, currI , currJ -1)) isEnd = true;
+            if (wasVisited(visitationRecord, currI , currJ -1)) return true;
             break;
         case "U":
             if (currI === 0) return true;
             if (wasVisited(visitationRecord, currI - 1, currJ)) return true;
             break;
+        default:
+            return false;
     }
-    return isEnd;
 }
 
 function pickNext(direction, currI, currJ) {
@@ -79,7 +81,6 @@ function pickNext(direction, currI, currJ) {
 
 function spiralOrder(matrix) {
     let record = prepareNewVisitationRecord(matrix);
-    console.log(record);
     let currPos = [0 , 0]
     let currDirection = "R";
     let stopsLeft = matrix.length * matrix[0].length;
@@ -91,7 +92,6 @@ function spiralOrder(matrix) {
         let currJ = currPos[1];
         spiral.push(matrix[currI][currJ]);
         record[currI][currJ] = true;
-        console.log(record);
         let turn = shouldTurn(record, currI, currJ, currDirection);
         if (turn === true) currDirection = turnRight(currDirection);
         currPos = pickNext(currDirection, currI, currJ);
